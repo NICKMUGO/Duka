@@ -43,7 +43,7 @@ fun WelcomeScreen(navController: NavController) {
             painter = painterResource(id = R.drawable.duka_background),
             contentDescription = "Duka Logo",
             modifier = Modifier
-                .size(120.dp)
+                .size(500.dp)
         )
 
         // App Title & Description
@@ -68,7 +68,7 @@ fun WelcomeScreen(navController: NavController) {
 
         // Button
         Button(
-            onClick = { /* TODO: Navigate to Login or Home Screen */ },
+            onClick = {navController.navigate("family_dashboard")},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
