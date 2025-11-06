@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,14 +30,22 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +56,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.duka.data.model.Family
 import com.example.duka.ui.theme.DukaTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +65,52 @@ fun FamilyScreen(
     navController: NavController
 ) {
     val state by viewModel.uiState
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage.collect { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            sheetState = sheetState
+        ) {
+            ListItem(
+                headlineContent = { Text("Create a new family") },
+                leadingContent = { Icon(Icons.Default.GroupAdd, contentDescription = null) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        sheetState.hide()
+                        showBottomSheet = false
+                        showCreateDialog = true
+                    }
+                }
+            )
+            ListItem(
+                headlineContent = { Text("Join with a code") },
+                leadingContent = { Icon(Icons.Default.Add, contentDescription = null) },
+                modifier = Modifier.clickable { /* TODO */ }
+            )
+            Spacer(Modifier.height(32.dp))
+        }
+    }
+
+    if (showCreateDialog) {
+        CreateFamilyDialog(
+            onCreate = {
+                viewModel.createFamily(it)
+                showCreateDialog = false
+            },
+            onDismiss = { showCreateDialog = false }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -63,10 +119,11 @@ fun FamilyScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton({}) {
-                Icon(Icons.Default.Add, contentDescription = "Join with Code")
+            FloatingActionButton(onClick = { showBottomSheet = true }) {
+                Icon(Icons.Default.Add, contentDescription = "Create or join family")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         AnimatedContent(
             targetState = state,
@@ -91,8 +148,11 @@ fun FamilyScreen(
                         families = screenState.families,
                         onSelect = {
                             viewModel.selectFamily(it)
+                            navController.navigate("family_dashboard")
                         },
-                        navController = navController
+                        onManage = {
+                            navController.navigate("family_settings/${it.id}")
+                        },
                     )
                 }
 
@@ -108,7 +168,40 @@ fun FamilyScreen(
     }
 }
 
-
+@Composable
+fun CreateFamilyDialog(onCreate: (String) -> Unit, onDismiss: () -> Unit) {
+    var familyName by remember { mutableStateOf("") }
+    
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Create New Family") },
+        text = {
+            OutlinedTextField(
+                value = familyName,
+                onValueChange = { familyName = it },
+                label = { Text("Family Name") },
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (familyName.isNotBlank()) {
+                        onCreate(familyName)
+                    }
+                },
+                enabled = familyName.isNotBlank()
+            ) {
+                Text("Create")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 
 @Composable
 fun CreateFamilyForm(onCreate: (String) -> Unit, navController: NavController) {
@@ -156,22 +249,22 @@ fun CreateFamilyForm(onCreate: (String) -> Unit, navController: NavController) {
 }
 
 @Composable
-fun FamilyList(families: List<Family>, onSelect: (Family) -> Unit, navController: NavController) {
+fun FamilyList(families: List<Family>, onSelect: (Family) -> Unit, onManage: (Family) -> Unit) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(families) { family ->
-            FamilyCard(family = family, onSelect = onSelect, navController = navController)
+            FamilyCard(family = family, onSelect = onSelect, onManage = onManage)
         }
     }
 }
 
 @Composable
-fun FamilyCard(family: Family, onSelect: (Family) -> Unit, navController: NavController) {
+fun FamilyCard(family: Family, onSelect: (Family) -> Unit, onManage: (Family) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable { onSelect(family) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -195,7 +288,13 @@ fun FamilyCard(family: Family, onSelect: (Family) -> Unit, navController: NavCon
                     )
                 }
             }
-            Icon(Icons.Default.ChevronRight, contentDescription = "Select")
+            if (family.isOwner) {
+                IconButton(onClick = { onManage(family) }) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = "Manage Family")
+                }
+            } else {
+                Icon(Icons.Default.ChevronRight, contentDescription = "Select")
+            }
         }
     }
 }
@@ -232,7 +331,6 @@ fun PreviewNoFamily() {
 @Preview(showBackground = true, name = "Has Families")
 @Composable
 fun PreviewHasFamilies() {
-    val fakeNavController = rememberNavController()
     DukaTheme {
         FamilyList(
             families = listOf(
@@ -240,7 +338,7 @@ fun PreviewHasFamilies() {
                 Family("2", "Weekend Crew", 6, false)
             ),
             onSelect = {},
-            navController = fakeNavController
+            onManage = {}
         )
     }
 }
