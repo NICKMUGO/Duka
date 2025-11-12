@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
 }
 
 android {
@@ -56,8 +57,16 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.ui)
+    implementation("androidx.navigation:navigation-compose:2.9.5")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
+    //implementation(libs.androidx.ui)
+    val roomVersion = "2.6.1" // ✅ use latest stable version
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    // For Kotlin coroutines + suspend functions
+    implementation("androidx.room:room-ktx:$roomVersion")
+    // For kapt (instead of annotationProcessor) if you use Kotlin
+    kapt("androidx.room:room-compiler:$roomVersion")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

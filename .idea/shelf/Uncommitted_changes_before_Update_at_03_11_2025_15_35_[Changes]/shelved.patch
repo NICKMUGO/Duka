@@ -1,0 +1,444 @@
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n    alias(libs.plugins.kotlin.android)\r\n    alias(libs.plugins.kotlin.compose)\r\n}\r\n\r\nandroid {\r\n    namespace = \"com.example.duka\"\r\n    compileSdk {\r\n        version = release(36)\r\n    }\r\n\r\n    defaultConfig {\r\n        applicationId = \"com.example.duka\"\r\n        minSdk = 30\r\n        targetSdk = 36\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\r\n                \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_11\r\n        targetCompatibility = JavaVersion.VERSION_11\r\n    }\r\n    kotlinOptions {\r\n        jvmTarget = \"11\"\r\n    }\r\n    buildFeatures {\r\n        compose = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    implementation(libs.androidx.activity.compose)\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(libs.androidx.compose.ui)\r\n    implementation(libs.androidx.compose.ui.graphics)\r\n    implementation(libs.androidx.compose.ui.tooling.preview)\r\n    implementation(libs.androidx.compose.material3)\r\n    implementation(\"androidx.navigation:navigation-compose:2.9.5\")\r\n    implementation(\"androidx.compose.material:material-icons-extended:1.6.0\")\r\n    implementation(libs.androidx.ui)\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.compose.ui.test.junit4)\r\n    debugImplementation(libs.androidx.compose.ui.tooling)\r\n    debugImplementation(libs.androidx.compose.ui.test.manifest)\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision a14a3646e707ff9a0aba13ec4a9e9f3bb2d01a20)
++++ b/app/build.gradle.kts	(date 1762173277195)
+@@ -60,5 +60,4 @@
+     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+     debugImplementation(libs.androidx.compose.ui.tooling)
+     debugImplementation(libs.androidx.compose.ui.test.manifest)
+-
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/example/duka/ui/family/FamilyScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/duka/ui/family/FamilyScreen.kt b/app/src/main/java/com/example/duka/ui/family/FamilyScreen.kt
+new file mode 100644
+--- /dev/null	(date 1762172971728)
++++ b/app/src/main/java/com/example/duka/ui/family/FamilyScreen.kt	(date 1762172971728)
+@@ -0,0 +1,217 @@
++package com.example.duka.ui.family
++
++
++import androidx.compose.animation.*
++import androidx.compose.foundation.clickable
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.items
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.*
++// ADD THESE LINES
++import androidx.compose.material.icons.filled.Group
++import androidx.compose.material.icons.filled.GroupAdd
++import androidx.compose.material.icons.filled.ChevronRight
++
++
++
++import androidx.compose.material3.*
++import androidx.compose.runtime.*
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.*
++
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.viewmodel.compose.viewModel // CHANGED: Added this import
++import com.example.duka.data.model.Family
++import com.example.duka.ui.theme.DukaTheme
++
++
++
++@OptIn(ExperimentalMaterial3Api::class)
++@Composable
++fun FamilyScreen(
++    // CHANGED: Replaced FamilyViewModel() with the viewModel() composable function.
++    // This correctly scopes the ViewModel to the navigation destination,
++    // so it survives recomposition and retains its state.
++    viewModel: FamilyViewModel = viewModel(),
++    onNavigateToHome: () -> Unit,
++    onJoinWithCode: () -> Unit
++) {
++    val state by viewModel.uiState
++
++    Scaffold(
++        topBar = {
++            CenterAlignedTopAppBar(
++                title = { Text("Family") }
++            )
++        },
++        floatingActionButton = {
++            FloatingActionButton(onClick = onJoinWithCode) {
++                Icon(Icons.Default.Add, "Join with Code")
++            }
++        }
++    ) { padding ->
++        AnimatedContent(
++            targetState = state,
++            modifier = Modifier.padding(padding)
++        ) { screenState: FamilyScreenState ->
++            when (screenState) {
++                is FamilyScreenState.Loading -> {
++                    Box(Modifier.fillMaxSize(), Alignment.Center) {
++                        CircularProgressIndicator()
++                    }
++                }
++                is FamilyScreenState.NoFamily -> {
++                    CreateFamilyForm(
++                        onCreate = { viewModel.createFamily(it) }
++                    )
++                }
++                is FamilyScreenState.HasFamilies -> {
++                    FamilyList(
++                        families = screenState.families,
++                        onSelect = {
++                            viewModel.selectFamily(it)
++                            onNavigateToHome()
++                        }
++                    )
++                }
++                is FamilyScreenState.CreatingFamily -> {
++                    CreatingFamilyView(screenState)
++                }
++                is FamilyScreenState.Error -> {
++                    ErrorView(screenState.message)
++                }
++            }
++        }
++    }
++}
++
++
++// --- NO OTHER CHANGES ARE NEEDED BELOW THIS LINE ---
++
++@Composable
++fun CreateFamilyForm(onCreate: (String) -> Unit) {
++    var familyName by remember { mutableStateOf("") }
++
++    Column(
++        modifier = Modifier
++            .fillMaxSize()
++            .padding(24.dp),
++        verticalArrangement = Arrangement.Center,
++        horizontalAlignment = Alignment.CenterHorizontally
++    ) {
++        Icon(Icons.Default.GroupAdd, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary)
++        Spacer(Modifier.height(24.dp))
++        Text("No Family Found", style = MaterialTheme.typography.headlineMedium)
++        Spacer(Modifier.height(8.dp))
++        Text("Create one to get started", style = MaterialTheme.typography.bodyMedium)
++        Spacer(Modifier.height(32.dp))
++
++        OutlinedTextField(
++            value = familyName,
++            onValueChange = { familyName = it },
++            label = { Text("Family Name") },
++            modifier = Modifier.fillMaxWidth(),
++            singleLine = true
++        )
++        Spacer(Modifier.height(16.dp))
++
++        Button(
++            onClick = {
++                onCreate(familyName)
++                familyName = ""
++            },
++            enabled = familyName.isNotBlank(),
++            modifier = Modifier.fillMaxWidth()
++        ) {
++            Text("Create Family")
++        }
++    }
++}
++
++@Composable
++fun FamilyList(families: List<Family>, onSelect: (Family) -> Unit) {
++    LazyColumn(modifier = Modifier.fillMaxSize()) {
++        items(families) { family ->
++            FamilyCard(family = family, onSelect = onSelect)
++        }
++    }
++}
++
++@Composable
++fun FamilyCard(family: Family, onSelect: (Family) -> Unit) {
++    Card(
++        modifier = Modifier
++            .fillMaxWidth()
++            .padding(8.dp)
++            .clickable { onSelect(family) },
++        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
++    ) {
++        Row(
++            modifier = Modifier.padding(16.dp),
++            verticalAlignment = Alignment.CenterVertically
++        ) {
++            Icon(
++                imageVector = Icons.Default.Group,
++                contentDescription = null,
++                modifier = Modifier.size(40.dp),
++                tint = MaterialTheme.colorScheme.primary
++            )
++            Spacer(Modifier.width(16.dp))
++            Column(modifier = Modifier.weight(1f)) {
++                Text(family.name, style = MaterialTheme.typography.titleMedium)
++                Text("${family.memberCount} members", style = MaterialTheme.typography.bodySmall)
++                if (family.isOwner) {
++                    AssistChip(
++                        onClick = { },
++                        label = { Text("Owner") },
++                        modifier = Modifier.padding(top = 4.dp)
++                    )
++                }
++            }
++            Icon(Icons.Default.ChevronRight, "Select")
++        }
++    }
++}
++
++@Composable
++fun CreatingFamilyView(state: FamilyScreenState.CreatingFamily) {
++    Box(Modifier.fillMaxSize(), Alignment.Center) {
++        Column(horizontalAlignment = Alignment.CenterHorizontally) {
++            CircularProgressIndicator()
++            Spacer(Modifier.height(16.dp))
++            Text("Creating family: ${state.name}...")
++        }
++    }
++}
++
++@Composable
++fun ErrorView(message: String) {
++    Box(Modifier.fillMaxSize(), Alignment.Center) {
++        Text("Error: $message", color = MaterialTheme.colorScheme.error)
++    }
++}
++
++@Preview(showBackground = true, name = "No Family")
++@Composable
++fun PreviewNoFamily() {
++    DukaTheme {
++        CreateFamilyForm(onCreate = {})
++    }
++}
++
++@Preview(showBackground = true, name = "Has Families")
++@Composable
++fun PreviewHasFamilies() {
++    DukaTheme {
++        FamilyList(
++            families = listOf(
++                Family("1", "The Johnsons", 4, true),
++                Family("2", "Weekend Crew", 6, false)
++            ),
++            onSelect = {}
++        )
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/duka/ui/family/FamilyScreenState.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/duka/ui/family/FamilyScreenState.kt b/app/src/main/java/com/example/duka/ui/family/FamilyScreenState.kt
+new file mode 100644
+--- /dev/null	(date 1762172971728)
++++ b/app/src/main/java/com/example/duka/ui/family/FamilyScreenState.kt	(date 1762172971728)
+@@ -0,0 +1,14 @@
++package com.example.duka.ui.family
++
++import com.example.duka.data.model.Family
++
++sealed class FamilyScreenState {
++    object Loading : FamilyScreenState()
++    data class NoFamily(val inviteCode: String? = null) : FamilyScreenState()
++    data class HasFamilies(
++        val families: List<Family>,
++        val selectedFamily: Family? = null
++    ) : FamilyScreenState()
++    data class CreatingFamily(val name: String = "") : FamilyScreenState()
++    data class Error(val message: String) : FamilyScreenState()
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/duka/ui/navigation/NavGraph.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/duka/ui/navigation/NavGraph.kt b/app/src/main/java/com/example/duka/ui/navigation/NavGraph.kt
+new file mode 100644
+--- /dev/null	(date 1762172971733)
++++ b/app/src/main/java/com/example/duka/ui/navigation/NavGraph.kt	(date 1762172971733)
+@@ -0,0 +1,20 @@
++package com.example.duka.ui.navigation
++
++import androidx.compose.runtime.Composable
++import androidx.navigation.NavHostController
++import androidx.navigation.compose.NavHost
++import androidx.navigation.compose.composable
++import com.example.duka.ui.family.FamilyScreen
++
++@Composable
++fun AppNavGraph(navController: NavHostController) {
++    NavHost(navController, startDestination = "family") {
++        composable("family") {
++            FamilyScreen(
++                onNavigateToHome = { /* Later */ },
++                onJoinWithCode = { /* Later */ }
++            )
++        }
++        // Add more screens later
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/duka/data/model/Family.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/duka/data/model/Family.kt b/app/src/main/java/com/example/duka/data/model/Family.kt
+new file mode 100644
+--- /dev/null	(date 1762172971726)
++++ b/app/src/main/java/com/example/duka/data/model/Family.kt	(date 1762172971726)
+@@ -0,0 +1,9 @@
++package com.example.duka.data.model
++
++//holds data regarding the famil. basically a blueprint for a family object
++data class Family(
++    val id: String,
++    val name: String,
++    val memberCount: Int = 1,
++    val isOwner: Boolean = false
++)
+\ No newline at end of file
+Index: gradle/libs.versions.toml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[versions]\r\nagp = \"8.13.0\"\r\nkotlin = \"2.0.21\"\r\ncoreKtx = \"1.17.0\"\r\njunit = \"4.13.2\"\r\njunitVersion = \"1.3.0\"\r\nespressoCore = \"3.7.0\"\r\nlifecycleRuntimeKtx = \"2.9.4\"\r\nactivityCompose = \"1.11.0\"\r\ncomposeBom = \"2024.09.00\"\r\nui = \"1.9.4\"\r\n\r\n[libraries]\r\nandroidx-core-ktx = { group = \"androidx.core\", name = \"core-ktx\", version.ref = \"coreKtx\" }\r\njunit = { group = \"junit\", name = \"junit\", version.ref = \"junit\" }\r\nandroidx-junit = { group = \"androidx.test.ext\", name = \"junit\", version.ref = \"junitVersion\" }\r\nandroidx-espresso-core = { group = \"androidx.test.espresso\", name = \"espresso-core\", version.ref = \"espressoCore\" }\r\nandroidx-lifecycle-runtime-ktx = { group = \"androidx.lifecycle\", name = \"lifecycle-runtime-ktx\", version.ref = \"lifecycleRuntimeKtx\" }\r\nandroidx-activity-compose = { group = \"androidx.activity\", name = \"activity-compose\", version.ref = \"activityCompose\" }\r\nandroidx-compose-bom = { group = \"androidx.compose\", name = \"compose-bom\", version.ref = \"composeBom\" }\r\nandroidx-compose-ui = { group = \"androidx.compose.ui\", name = \"ui\" }\r\nandroidx-compose-ui-graphics = { group = \"androidx.compose.ui\", name = \"ui-graphics\" }\r\nandroidx-compose-ui-tooling = { group = \"androidx.compose.ui\", name = \"ui-tooling\" }\r\nandroidx-compose-ui-tooling-preview = { group = \"androidx.compose.ui\", name = \"ui-tooling-preview\" }\r\nandroidx-compose-ui-test-manifest = { group = \"androidx.compose.ui\", name = \"ui-test-manifest\" }\r\nandroidx-compose-ui-test-junit4 = { group = \"androidx.compose.ui\", name = \"ui-test-junit4\" }\r\nandroidx-compose-material3 = { group = \"androidx.compose.material3\", name = \"material3\" }\r\nandroidx-ui = { group = \"androidx.compose.ui\", name = \"ui\", version.ref = \"ui\" }\r\n\r\n[plugins]\r\nandroid-application = { id = \"com.android.application\", version.ref = \"agp\" }\r\nkotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }\r\nkotlin-compose = { id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+--- a/gradle/libs.versions.toml	(revision a14a3646e707ff9a0aba13ec4a9e9f3bb2d01a20)
++++ b/gradle/libs.versions.toml	(date 1762173169528)
+@@ -9,6 +9,7 @@
+ activityCompose = "1.11.0"
+ composeBom = "2024.09.00"
+ ui = "1.9.4"
++navigationCompose = "2.9.5"
+ 
+ [libraries]
+ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+@@ -25,7 +26,6 @@
+ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+ androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+-androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+ 
+ [plugins]
+ android-application = { id = "com.android.application", version.ref = "agp" }
+Index: app/src/main/java/com/example/duka/ui/theme/navigation/NavGraph.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/duka/ui/theme/navigation/NavGraph.kt b/app/src/main/java/com/example/duka/ui/theme/navigation/NavGraph.kt
+new file mode 100644
+--- /dev/null	(date 1762172971734)
++++ b/app/src/main/java/com/example/duka/ui/theme/navigation/NavGraph.kt	(date 1762172971734)
+@@ -0,0 +1,4 @@
++package com.example.duka.ui.theme.navigation
++
++class NavGraph {
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/duka/ui/family/FamilyViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/duka/ui/family/FamilyViewModel.kt b/app/src/main/java/com/example/duka/ui/family/FamilyViewModel.kt
+new file mode 100644
+--- /dev/null	(date 1762172971731)
++++ b/app/src/main/java/com/example/duka/ui/family/FamilyViewModel.kt	(date 1762172971731)
+@@ -0,0 +1,71 @@
++package com.example.duka.ui.family
++
++import androidx.compose.runtime.mutableStateOf
++import androidx.lifecycle.ViewModel
++import androidx.lifecycle.viewModelScope
++import com.example.duka.data.model.Family
++import kotlinx.coroutines.delay
++import kotlinx.coroutines.launch
++import androidx.compose.runtime.State
++
++class FakeFamilyRepository {
++    private val families = mutableListOf<Family>()
++
++    suspend fun getUserFamilies(): List<Family> {
++        delay(500)
++        return families.toList()
++    }
++
++    suspend fun saveFamily(family: Family) {
++        families.add(family)
++    }
++
++    suspend fun setActiveFamily(family: Family) {
++        // Save to SharedPreferences later
++    }
++}
++
++class FamilyViewModel : ViewModel() {
++
++    private val repository = FakeFamilyRepository()
++
++    private val _uiState = mutableStateOf<FamilyScreenState>(FamilyScreenState.Loading)
++    val uiState: State<FamilyScreenState> = _uiState
++
++    init {
++        loadFamilies()
++    }
++
++    fun loadFamilies() {
++        viewModelScope.launch {
++            _uiState.value = FamilyScreenState.Loading
++            val families = repository.getUserFamilies()
++            _uiState.value = when {
++                families.isEmpty() -> FamilyScreenState.NoFamily()
++                else -> FamilyScreenState.HasFamilies(families)
++            }
++        }
++    }
++
++    fun createFamily(name: String) {
++        if (name.isBlank()) return
++        viewModelScope.launch {
++            _uiState.value = FamilyScreenState.CreatingFamily(name)
++            delay(800)
++            val newFamily = Family(
++                id = "fam_${System.currentTimeMillis()}",
++                name = name,
++                isOwner = true
++            )
++            repository.saveFamily(newFamily)
++            loadFamilies()
++        }
++    }
++
++    fun selectFamily(family: Family) {
++        viewModelScope.launch {
++            repository.setActiveFamily(family)
++            // In real app: navigate to home
++        }
++    }
++}
+\ No newline at end of file
