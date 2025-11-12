@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.duka.ui.navigation.AppNavGraph
+import com.example.duka.ui.screens.GroceryListScreen
 
 import com.example.duka.ui.theme.DukaTheme
 
