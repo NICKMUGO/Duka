@@ -1,4 +1,4 @@
-package com.example.duka.data.dao
+package com.example.duka.dao.data
 
 import androidx.room.*
 import com.example.duka.data.model.Family
