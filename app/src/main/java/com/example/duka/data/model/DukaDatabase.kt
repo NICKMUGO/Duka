@@ -32,7 +32,9 @@ abstract class DukaDatabase : RoomDatabase() {
                     context.applicationContext,
                     DukaDatabase::class.java,
                     "duka_database"
-                ).fallbackToDestructiveMigration().build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }

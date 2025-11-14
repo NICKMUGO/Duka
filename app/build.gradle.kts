@@ -62,7 +62,6 @@ dependencies {
     //implementation(libs.androidx.ui)
     val roomVersion = "2.6.1" // ✅ use latest stable version
     implementation("androidx.room:room-runtime:$roomVersion")
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
     // For Kotlin coroutines + suspend functions
     implementation("androidx.room:room-ktx:$roomVersion")
     // For kapt (instead of annotationProcessor) if you use Kotlin

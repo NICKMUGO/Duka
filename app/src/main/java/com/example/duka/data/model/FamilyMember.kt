@@ -25,7 +25,7 @@ data class FamilyMember(
     val id: Int = 0,
     @ColumnInfo(name = "family_id") val familyId: Int,
     @ColumnInfo(name = "user_id") val userId: Int,
+    // The user's role in the family, e.g., "owner" or "member"
     val role: String = "member",
-    val isOwner: Boolean = false,
     val joinedAt: Long = System.currentTimeMillis()
 )
