@@ -1,13 +1,17 @@
 package com.example.duka.data.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.example.duka.data.model.Family
 
 @Dao
 interface FamilyDao {
 
     // Insert a new family
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertFamily(family: Family): Long
 
     // Retrieve all families
