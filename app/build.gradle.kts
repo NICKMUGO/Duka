@@ -45,10 +45,9 @@ android {
 dependencies {
     // Check your existing lifecycle versions to ensure they match. 2.9.4 is a good choice based on your other dependencies.
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
-
     // ADD THIS LINE for the extended Material icons library
     implementation("androidx.compose.material:material-icons-extended")
-
+    implementation(libs.javafaker)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
