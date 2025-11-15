@@ -1,4 +1,4 @@
-package com.example.duka.ui.family
+package com.example.duka.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -7,6 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.duka.ui.shoppingitems.AddShoppingListScreen
+import com.example.duka.ui.family.FamilyDashboardScreen
+import com.example.duka.ui.family.WelcomeScreen
 import com.example.duka.ui.screens.GroceryListScreen
 
 

@@ -1,10 +1,11 @@
-package com.example.duka.ui.family
+package com.example.duka.ui.shoppingitems
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,7 +21,7 @@ import com.example.duka.viewmodel.ShoppingListViewModel
 fun AddShoppingListScreen(
     navController: NavController,
     familyId: Int,
-    shoppingListViewModel: ShoppingListViewModel = viewModel(factory = Injection.provideViewModelFactory(context = androidx.compose.ui.platform.LocalContext.current))
+    shoppingListViewModel: ShoppingListViewModel = viewModel(factory = Injection.provideViewModelFactory(context = LocalContext.current))
 ) {
     var listName by remember { mutableStateOf("") }
     var listDescription by remember { mutableStateOf("") }
