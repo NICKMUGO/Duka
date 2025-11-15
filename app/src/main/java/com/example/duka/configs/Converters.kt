@@ -1,4 +1,4 @@
-package com.example.duka.dao.data
+package com.example.duka.configs
 
 import androidx.room.TypeConverter
 import java.util.Date

@@ -1,4 +1,4 @@
-package com.example.duka.dao.data
+package com.example.duka.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

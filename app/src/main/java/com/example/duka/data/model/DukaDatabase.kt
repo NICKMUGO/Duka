@@ -5,7 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.duka.dao.data.*
+
+import com.example.duka.configs.Converters
+import com.example.duka.data.dao.FamilyDao
+import com.example.duka.data.dao.FamilyMemberDao
+import com.example.duka.data.dao.ListItemDao
+import com.example.duka.data.dao.ShoppingListDao
+import com.example.duka.data.dao.UserDao
 
 
 @Database(

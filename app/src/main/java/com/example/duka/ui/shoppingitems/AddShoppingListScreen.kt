@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.duka.Injection
+import com.example.duka.configs.Injection
 import com.example.duka.data.model.ShoppingList
 import com.example.duka.ui.theme.DukaTheme
 import com.example.duka.viewmodel.ShoppingListViewModel

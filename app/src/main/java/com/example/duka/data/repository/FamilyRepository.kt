@@ -1,7 +1,7 @@
 package com.example.duka.data.repository
 
-import com.example.duka.dao.data.FamilyDao
-import com.example.duka.dao.data.FamilyMemberDao
+import com.example.duka.data.dao.FamilyDao
+import com.example.duka.data.dao.FamilyMemberDao
 import com.example.duka.data.model.Family
 import com.example.duka.data.model.FamilyMember
 

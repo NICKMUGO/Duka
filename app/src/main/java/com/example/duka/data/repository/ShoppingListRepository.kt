@@ -1,6 +1,6 @@
 package com.example.duka.data.repository
 
-import com.example.duka.dao.data.ShoppingListDao
+import com.example.duka.data.dao.ShoppingListDao
 import com.example.duka.data.model.ShoppingList
 
 class ShoppingListRepository(private val shoppingListDao: ShoppingListDao) {

@@ -10,13 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.duka.Injection
+import com.example.duka.configs.Injection
 import com.example.duka.data.model.ShoppingList
 import com.example.duka.ui.theme.DukaTheme
 import com.example.duka.viewmodel.ShoppingListViewModel
@@ -26,7 +27,7 @@ import com.example.duka.viewmodel.ShoppingListViewModel
 fun GroceryListScreen(
     familyId: Int,
     navController: NavController,
-    shoppingListViewModel: ShoppingListViewModel = viewModel(factory = Injection.provideViewModelFactory(context = androidx.compose.ui.platform.LocalContext.current))
+    shoppingListViewModel: ShoppingListViewModel = viewModel(factory = Injection.provideViewModelFactory(context = LocalContext.current))
 ) {
     val shoppingLists by shoppingListViewModel.shoppingLists.collectAsState()
 
