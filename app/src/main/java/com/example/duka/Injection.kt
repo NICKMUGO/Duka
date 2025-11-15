@@ -5,7 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.duka.data.model.DukaDatabase
 import com.example.duka.data.repository.FamilyRepository
+import com.example.duka.data.repository.ListItemRepository
+import com.example.duka.data.repository.ShoppingListRepository
 import com.example.duka.ui.family.FamilyViewModel
+import com.example.duka.viewmodel.ListItemViewModel
+import com.example.duka.viewmodel.ShoppingListViewModel
 
 object Injection {
     private fun provideFamilyRepository(context: Context): FamilyRepository {
@@ -13,17 +17,33 @@ object Injection {
         return FamilyRepository(database.familyDao(), database.familyMemberDao())
     }
 
-    fun provideFamilyViewModelFactory(context: Context): ViewModelProvider.Factory {
+    private fun provideShoppingListRepository(context: Context): ShoppingListRepository {
+        val database = DukaDatabase.getDatabase(context.applicationContext)
+        return ShoppingListRepository(database.shoppingListDao())
+    }
+
+    private fun provideListItemRepository(context: Context): ListItemRepository {
+        val database = DukaDatabase.getDatabase(context.applicationContext)
+        return ListItemRepository(database.listItemDao())
+    }
+
+    fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
         return object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(FamilyViewModel::class.java)) {
-                    // For now, we assume a hardcoded user ID of 1. 
-                    // This will be replaced by a real authentication system later.
-                    val currentUserId = 1
-                    return FamilyViewModel(provideFamilyRepository(context), currentUserId) as T
+                return when {
+                    modelClass.isAssignableFrom(FamilyViewModel::class.java) -> {
+                        val currentUserId = 1 // Hardcoded user ID
+                        FamilyViewModel(provideFamilyRepository(context), currentUserId) as T
+                    }
+                    modelClass.isAssignableFrom(ShoppingListViewModel::class.java) -> {
+                        ShoppingListViewModel(provideShoppingListRepository(context)) as T
+                    }
+                    modelClass.isAssignableFrom(ListItemViewModel::class.java) -> {
+                        ListItemViewModel(provideListItemRepository(context)) as T
+                    }
+                    else -> throw IllegalArgumentException("Unknown ViewModel class")
                 }
-                throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
     }

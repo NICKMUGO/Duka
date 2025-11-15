@@ -36,7 +36,7 @@ import com.example.duka.ui.theme.DukaTheme
 @Composable
 fun FamilySettingsScreen(
     familyId: Int,
-    viewModel: FamilyViewModel = viewModel(factory = Injection.provideFamilyViewModelFactory(LocalContext.current)),
+    viewModel: FamilyViewModel = viewModel(factory = Injection.provideViewModelFactory(LocalContext.current)),
     navController: NavController
 ) {
     val state by viewModel.uiState

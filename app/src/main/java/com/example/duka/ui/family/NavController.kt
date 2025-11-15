@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.duka.ui.screens.GroceryListScreen
 
 
 @Composable
@@ -17,30 +18,39 @@ fun AppNavigation() {
         navController = navController,
         startDestination = "welcome" // We start at the family screen for this flow
     ) {
-//        composable("family") {
-//            FamilyScreen(navController = navController)
-//        }
-//
-//        composable(
-//            route = "family_settings/{familyId}",
-//            arguments = listOf(navArgument("familyId") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val familyId = backStackEntry.arguments?.getString("familyId")
-//            if (familyId != null) {
-//                FamilySettingsScreen(
-//                    familyId = familyId,
-//                    navController = navController
-//                )
-//            }
-//        }
 
         composable("family_dashboard") {
             FamilyDashboardScreen(navController = navController)
         }
 
-        // The WelcomeScreen is not used in this flow, but I'll keep it here for now
         composable("welcome") {
             WelcomeScreen(navController = navController)
+        }
+
+        composable(
+            route = "grocery_list/{familyId}",
+            arguments = listOf(navArgument("familyId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val familyId = backStackEntry.arguments?.getInt("familyId")
+            if (familyId != null) {
+                GroceryListScreen(
+                    familyId = familyId,
+                    navController = navController
+                )
+            }
+        }
+
+        composable(
+            route = "add_shopping_list/{familyId}",
+            arguments = listOf(navArgument("familyId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val familyId = backStackEntry.arguments?.getInt("familyId")
+            if (familyId != null) {
+                AddShoppingListScreen(
+                    navController = navController,
+                    familyId = familyId
+                )
+            }
         }
     }
 }

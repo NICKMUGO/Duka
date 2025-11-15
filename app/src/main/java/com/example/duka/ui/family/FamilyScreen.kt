@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FamilyScreen(
     navController: NavController,
-    viewModel: FamilyViewModel = viewModel(factory = Injection.provideFamilyViewModelFactory(LocalContext.current))
+    viewModel: FamilyViewModel = viewModel(factory = Injection.provideViewModelFactory(LocalContext.current))
 ) {
     val state by viewModel.uiState
     val scope = rememberCoroutineScope()
