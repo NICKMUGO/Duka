@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.navigation:navigation-compose:2.9.5")
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation("com.github.javafaker:javafaker:1.0.2") // Added this line
     //implementation(libs.androidx.ui)
     val roomVersion = "2.6.1" // ✅ use latest stable version
     implementation("androidx.room:room-runtime:$roomVersion")

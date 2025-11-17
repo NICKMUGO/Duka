@@ -1,15 +1,22 @@
 package com.example.duka.ui.family
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -21,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,36 +47,60 @@ fun FamilySettingsScreen(
     viewModel: FamilyViewModel = viewModel(factory = Injection.provideViewModelFactory(LocalContext.current)),
     navController: NavController
 ) {
-    val state by viewModel.uiState
-
-    val familyDetails = remember(state, familyId) {
-        (state as? FamilyScreenState.HasFamilies)?.families?.find { it.family.id == familyId }
+    // 1. Trigger the load for the specific family details when the screen appears
+    LaunchedEffect(familyId) {
+        viewModel.loadFamilyDetails(familyId)
     }
+
+    // 2. Observe the new, dedicated state for this screen
+    val state by viewModel.settingsState
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text("Family Settings") })
-        }
-    ) { padding ->
-        if (familyDetails != null) {
-            FamilySettingsContent(
-                modifier = Modifier.padding(padding),
-                familyDetails = familyDetails,
-                onSave = { newName ->
-                    viewModel.updateFamilyName(familyDetails.family.id, newName)
-                },
-                onDelete = {
-                    viewModel.deleteFamily(familyDetails.family.id)
-                    navController.popBackStack()
-                },
-                onLeave = {
-                    viewModel.leaveFamily(familyDetails.family.id)
-                    navController.popBackStack()
+            CenterAlignedTopAppBar(
+                title = { Text("Family Settings") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
                 }
             )
-        } else {
-            LaunchedEffect(Unit) {
-                navController.popBackStack()
+        }
+    ) { padding ->
+        // 3. Handle the new state (Loading, Success, Error)
+        Box(modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()) {
+            when (val screenState = state) {
+                is FamilySettingsState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                is FamilySettingsState.Success -> {
+                    FamilySettingsContent(
+                        familyDetails = screenState.familyDetails,
+                        onSave = {
+                            viewModel.updateFamilyName(screenState.familyDetails.family.id, it)
+                        },
+                        onDelete = {
+                            viewModel.deleteFamily(screenState.familyDetails.family.id)
+                            navController.popBackStack() // Navigate back after deleting
+                        },
+                        onLeave = {
+                            viewModel.leaveFamily(screenState.familyDetails.family.id)
+                            navController.popBackStack() // Navigate back after leaving
+                        }
+                    )
+                }
+                is FamilySettingsState.Error -> {
+                    Text(
+                        text = screenState.message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
     }

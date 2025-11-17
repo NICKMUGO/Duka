@@ -16,10 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.duka.configs.Injection
 import com.example.duka.data.repository.FamilyDetails
 import com.example.duka.ui.theme.DukaTheme
 import kotlinx.coroutines.launch
+import com.example.duka.configs.Injection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +107,7 @@ fun FamilyScreen(
                 is FamilyScreenState.HasFamilies -> {
                     FamilyList(
                         families = screenState.families,
-                        onSelect = { /* viewModel.selectFamily(it) - TODO */ navController.navigate("shopping_lists") },
+                        onSelect = { navController.navigate("grocery_list/${it.family.id}") },
                         onManage = { navController.navigate("family_settings/${it.family.id}") },
                     )
                 }

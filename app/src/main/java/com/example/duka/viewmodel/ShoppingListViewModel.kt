@@ -13,7 +13,11 @@ class ShoppingListViewModel(private val shoppingListRepository: ShoppingListRepo
     private val _shoppingLists = MutableStateFlow<List<ShoppingList>>(emptyList())
     val shoppingLists: StateFlow<List<ShoppingList>> = _shoppingLists
 
+    // Keep track of the current family to reload lists automatically
+    private var currentFamilyId: Int? = null
+
     fun loadShoppingLists(familyId: Int) {
+        currentFamilyId = familyId
         viewModelScope.launch {
             _shoppingLists.value = shoppingListRepository.getShoppingListsByFamilyId(familyId)
         }
@@ -22,18 +26,35 @@ class ShoppingListViewModel(private val shoppingListRepository: ShoppingListRepo
     fun addShoppingList(shoppingList: ShoppingList) {
         viewModelScope.launch {
             shoppingListRepository.insertShoppingList(shoppingList)
+            // Automatically refresh the list after adding
+            currentFamilyId?.let { loadShoppingLists(it) }
         }
     }
 
-    fun updateShoppingList(shoppingList: ShoppingList) {
+    fun updateShoppingList(listId: Int, newName: String, newDescription: String?) {
         viewModelScope.launch {
-            shoppingListRepository.updateShoppingList(shoppingList)
+            val originalList = shoppingListRepository.getShoppingListById(listId)
+            if (originalList != null) {
+                val updatedList = originalList.copy(
+                    name = newName,
+                    description = newDescription,
+                    updatedAt = System.currentTimeMillis()
+                )
+                shoppingListRepository.updateShoppingList(updatedList)
+                // Automatically refresh the list after updating
+                currentFamilyId?.let { loadShoppingLists(it) }
+            }
         }
     }
 
-    fun deleteShoppingList(shoppingList: ShoppingList) {
+    fun deleteShoppingList(listId: Int) {
         viewModelScope.launch {
-            shoppingListRepository.deleteShoppingList(shoppingList)
+            val listToDelete = shoppingListRepository.getShoppingListById(listId)
+            if (listToDelete != null) {
+                shoppingListRepository.deleteShoppingList(listToDelete)
+                // Automatically refresh the list after deleting
+                currentFamilyId?.let { loadShoppingLists(it) }
+            }
         }
     }
 }

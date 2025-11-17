@@ -4,16 +4,12 @@ package com.example.duka.ui.family
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-// ADD THESE LINES
-
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,25 +25,29 @@ fun WelcomeScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
-        Image(
-            painter = painterResource(id = R.drawable.duka_background),
-            contentDescription = "Duka Logo",
-            modifier = Modifier
-                .size(500.dp)
-        )
+        // This Column will contain the top content and be centered
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(1f) // Takes up available space, pushing button to bottom
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.duka_background),
+                contentDescription = "Duka Logo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp) // Responsive padding
+            )
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Welcome to Duka",
                 style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Companion.Bold,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 28.sp
                 ),
-                textAlign = TextAlign.Companion.Center
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
@@ -55,13 +55,13 @@ fun WelcomeScreen(navController: NavController) {
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 ),
-                textAlign = TextAlign.Companion.Center
+                textAlign = TextAlign.Center
             )
         }
 
-
+        // This button will be at the bottom because the column above took all the weighted space
         Button(
-            onClick = {navController.navigate("create_family")},
+            onClick = { navController.navigate("family_hub") }, // Corrected navigation route
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -70,7 +70,7 @@ fun WelcomeScreen(navController: NavController) {
                 containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
-            Text(text = "Get Started", fontSize = 18.sp, fontWeight = FontWeight.Companion.SemiBold)
+            Text(text = "Get Started", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
