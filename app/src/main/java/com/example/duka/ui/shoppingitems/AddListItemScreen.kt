@@ -22,33 +22,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.duka.configs.Injection
-import com.example.duka.data.model.ShoppingList
-import com.example.duka.ui.theme.DukaTheme
-import com.example.duka.viewmodel.ShoppingListViewModel
+import com.example.duka.data.model.ListItem
+import com.example.duka.viewmodel.ListItemViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddShoppingListScreen(
+fun AddListItemScreen(
     navController: NavController,
-    familyId: Int,
-    shoppingListViewModel: ShoppingListViewModel = viewModel(factory = Injection.provideViewModelFactory(context = LocalContext.current))
+    listId: Int,
+    listItemViewModel: ListItemViewModel = viewModel(factory = Injection.provideViewModelFactory(context = LocalContext.current))
 ) {
-    var listName by remember { mutableStateOf("") }
-    var listDescription by remember { mutableStateOf("") }
+    var itemName by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add New Shopping List") },
+                title = { Text("Add New Item") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
@@ -65,46 +61,41 @@ fun AddShoppingListScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedTextField(
-                value = listName,
-                onValueChange = { listName = it },
-                label = { Text("List Name") },
-                modifier = Modifier.fillMaxWidth()
+                value = itemName,
+                onValueChange = { itemName = it },
+                label = { Text("Item Name") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            OutlinedTextField(
+                value = quantity,
+                onValueChange = { quantity = it },
+                label = { Text("Quantity (e.g., 2 packs)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = listDescription,
-                onValueChange = { listDescription = it },
-                label = { Text("List Description (Optional)") },
+            Button(
+                onClick = {
+                    val newItem = ListItem(
+                        listId = listId,
+                        name = itemName,
+                        quantity = quantity.takeIf { it.isNotBlank() },
+                        assignedUserId = null, // Not handled in this simple form
+                        category = null, // Not handled
+                        notes = null // Not handled
+                    )
+                    listItemViewModel.addListItem(newItem)
+                    navController.popBackStack()
+                },
+                enabled = itemName.isNotBlank(),
                 modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = {
-                val newList = ShoppingList(
-                    familyId = familyId,
-                    name = listName,
-                    description = listDescription.takeIf { it.isNotBlank() },
-                    createdBy = 1 // Hardcoded user ID for now
-                )
-                shoppingListViewModel.addShoppingList(newList)
-                navController.popBackStack()
-            }, enabled = listName.isNotBlank()) {
-                Text("Save List")
+            ) {
+                Text("Add Item")
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AddShoppingListScreenPreview() {
-    DukaTheme {
-        AddShoppingListScreen(
-            navController = rememberNavController(),
-            familyId = 1
-        )
     }
 }

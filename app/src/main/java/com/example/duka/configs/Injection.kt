@@ -13,17 +13,17 @@ import com.example.duka.viewmodel.ShoppingListViewModel
 
 object Injection {
     private fun provideFamilyRepository(context: Context): FamilyRepository {
-        val database = DukaDatabase.Companion.getDatabase(context.applicationContext)
+        val database = DukaDatabase.getDatabase(context.applicationContext)
         return FamilyRepository(database.familyDao(), database.familyMemberDao())
     }
 
     private fun provideShoppingListRepository(context: Context): ShoppingListRepository {
-        val database = DukaDatabase.Companion.getDatabase(context.applicationContext)
+        val database = DukaDatabase.getDatabase(context.applicationContext)
         return ShoppingListRepository(database.shoppingListDao())
     }
 
     private fun provideListItemRepository(context: Context): ListItemRepository {
-        val database = DukaDatabase.Companion.getDatabase(context.applicationContext)
+        val database = DukaDatabase.getDatabase(context.applicationContext)
         return ListItemRepository(database.listItemDao())
     }
 
