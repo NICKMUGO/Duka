@@ -3,7 +3,7 @@ package com.example.duka.configs
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.duka.data.model.DukaDatabase
+import com.example.duka.data.database.DukaDatabase
 import com.example.duka.data.repository.FamilyRepository
 import com.example.duka.data.repository.ListItemRepository
 import com.example.duka.data.repository.ShoppingListRepository

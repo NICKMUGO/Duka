@@ -1,16 +1,22 @@
 package com.example.duka.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.duka.data.database.DukaDatabase
+import com.example.duka.ui.authentication.LoginScreen
 import com.example.duka.ui.shoppingitems.AddShoppingListScreen
 import com.example.duka.ui.family.FamilyDashboardScreen
 import com.example.duka.ui.family.WelcomeScreen
 import com.example.duka.ui.screens.GroceryListScreen
+import com.example.duka.ui.authentication.SignUpScreen
+
+
 
 
 @Composable
@@ -28,6 +34,14 @@ fun AppNavigation() {
 
         composable("welcome") {
             WelcomeScreen(navController = navController)
+        }
+
+        composable (route = "signup"){
+            SignUpScreen(navController = navController)
+        }
+
+        composable (route = "login"){
+            LoginScreen(navController = navController)
         }
 
         composable(

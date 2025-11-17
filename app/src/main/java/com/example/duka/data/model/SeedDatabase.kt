@@ -35,8 +35,7 @@ suspend fun seedDatabase(database: DukaDatabase) {
         val member = FamilyMember(
             familyId = families.random().id, // valid family ID
             userId = users.random().id,      // valid user ID
-            role = if (i % 3 == 0) "owner" else "member",
-            isOwner = i % 3 == 0
+            role = if (i % 3 == 0) "owner" else "member"
         )
         database.familyMemberDao().insertMembership(member)
     }

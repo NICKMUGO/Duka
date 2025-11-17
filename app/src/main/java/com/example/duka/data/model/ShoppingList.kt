@@ -8,13 +8,13 @@ import androidx.room.PrimaryKey
     tableName = "shopping_lists",
     foreignKeys = [
         ForeignKey(
-            entity = Family::class,  // Assuming Family entity exists
+            entity = Family::class,
             parentColumns = ["id"],
             childColumns = ["familyId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
-            entity = User::class,  // Assuming User entity exists
+            entity = User::class,
             parentColumns = ["id"],
             childColumns = ["createdBy"]
         )
