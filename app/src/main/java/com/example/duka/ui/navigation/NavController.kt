@@ -11,7 +11,9 @@ import com.example.duka.ui.family.FamilyScreen
 import com.example.duka.ui.family.FamilySettingsScreen
 import com.example.duka.ui.family.WelcomeScreen
 import com.example.duka.ui.screens.GroceryListScreen
+import com.example.duka.ui.shoppingitems.AddListItemScreen
 import com.example.duka.ui.shoppingitems.AddShoppingListScreen
+import com.example.duka.ui.shoppingitems.EditListItemScreen
 import com.example.duka.ui.shoppingitems.EditShoppingListScreen
 import com.example.duka.ui.shoppingitems.ListItemScreen
 
@@ -84,7 +86,6 @@ fun AppNavigation() {
             }
         }
 
-        // The new route for viewing items in a shopping list
         composable(
             route = "list_items/{listId}",
             arguments = listOf(navArgument("listId") { type = NavType.IntType })
@@ -93,6 +94,33 @@ fun AppNavigation() {
             if (listId != null) {
                 ListItemScreen(
                     listId = listId,
+                    navController = navController
+                )
+            }
+        }
+
+        composable(
+            route = "add_list_item/{listId}",
+            arguments = listOf(navArgument("listId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val listId = backStackEntry.arguments?.getInt("listId")
+            if (listId != null) {
+                AddListItemScreen(
+                    listId = listId,
+                    navController = navController
+                )
+            }
+        }
+
+        // The new route for editing an item in a shopping list
+        composable(
+            route = "edit_list_item/{itemId}",
+            arguments = listOf(navArgument("itemId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getInt("itemId")
+            if (itemId != null) {
+                EditListItemScreen(
+                    itemId = itemId,
                     navController = navController
                 )
             }
